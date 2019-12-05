@@ -9,26 +9,23 @@ public class BulletMovement : MonoBehaviour {
     public float speed;
 	public GameObject player;
 
-	// Use this for initialization
 	void OnEnable () 
 	{
+		//Since we are using object pooling. The velocity is set for the bullet OnEnable.
 		rigid = GetComponent<Rigidbody>();
 		SetSpeed();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
 	}
 
 	void SetSpeed () 
 	{
+		//Propel the bullet upwards with a fixed velocity.
 		Vector3 velocity = (transform.up * speed * Time.fixedDeltaTime);
 		rigid.velocity = velocity;
 	}
 
 	void OnTriggerEnter (Collider other)
 	{
+		//Deactivate the bullet when it hits the ceiling.
 		if (other.gameObject.tag == "TopWall")  {
 			gameObject.SetActive(false);
 		}

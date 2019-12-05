@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+//Althought this script is name PlayerMovement, Shooting is also described here.
+//Sorry for the slight confusion.
 public class PlayerMovement : MonoBehaviour
 {
     private Rigidbody rigid; 
