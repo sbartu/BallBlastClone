@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+//Serializable object pools to be used by
+//bullets and balls.
 [System.Serializable]
 public class ObjectPoolItem {
 	public int amountToPool;
@@ -17,10 +19,14 @@ public class ObjectPooler : MonoBehaviour {
 
 	void Awake() 
 	{
+		//Create a shared instance to be used by other scripts.
 		sharedInstance = this;
 	}
-	// Use this for initialization
-	void Start () {
+
+	void Start () 
+	{
+		//Instantiate objects into their respectives pools
+		//for the given amount.
 		pooledObjects = new List<GameObject>();
 		foreach (ObjectPoolItem item in itemsToPool) {
 			for (int i = 0; i < item.amountToPool; i++) {
@@ -30,18 +36,15 @@ public class ObjectPooler : MonoBehaviour {
 			}
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
 
 	public GameObject GetPooledObject(string tag) {
+		//Return non-active pool object by tag.
 		for (int i = 0; i < pooledObjects.Count; i++) {
 			if (!pooledObjects[i].activeInHierarchy && pooledObjects[i].tag == tag) {
 				return pooledObjects[i];
 			}
 		}
+		//If all the objects are active, insantiate a new one if the pools it ok to be expanded.
 		foreach (ObjectPoolItem item in itemsToPool) {
 			if (item.objectToPool.tag == tag) {
 				if (item.shouldExpand) {
@@ -52,11 +55,13 @@ public class ObjectPooler : MonoBehaviour {
 				}
 			}
 		}
+		//Otherwise return null.
 		return null;
 	}
 
 	public bool EnemiesDead() 
 	{
+		//Return true if all of the enemies of the current level are dead.
 		for (int i = 0; i < pooledObjects.Count; i++) {
 			if (pooledObjects[i].activeInHierarchy && pooledObjects[i].tag == "Enemy") {
 				return false;

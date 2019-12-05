@@ -17,12 +17,14 @@ public class Stats : MonoBehaviour {
 
 	void Awake() 
 	{
+		//Store the input created from the json file.
 		input = InputData.CreateFromJSON();
 		sharedInstance = this;
 	}
 
 	void Start () 
 	{
+		//Initialize stats from the given json.
 		gravity = input.gravity;
 		bulletCountIncrease = input.bullet_count_increase;
 		bulletDamageIncrease = input.bullet_damage_increase;
@@ -30,14 +32,15 @@ public class Stats : MonoBehaviour {
 
 	public void IncreaseStats () 
 	{
+		//Increase stats by given amount from the json.
 		bulletCount += bulletCountIncrease;
 		bulletDamage += bulletDamageIncrease;
 	}
 
 	public Vector3 GetRandomSize () 
 	{
+		//Randomize ball sizes for flavor.
 		float newSize = Random.Range(ballMinSize, ballMaxSize);
-		Debug.Log(newSize);
 		return new Vector3(newSize, newSize, 0.25f);
 	}
 }

@@ -23,7 +23,7 @@ public class BallHealth : MonoBehaviour {
 	private Vector3 explodePosition;
 	private Text healthText;
 
-	// Use this for initialization
+
 	void Start () 
 	{
 		colorsLength = colors.Length;
@@ -31,8 +31,7 @@ public class BallHealth : MonoBehaviour {
 		healthText = GetComponentInChildren<Text>();
 		newFreq = colorChangeFrequency;
 	}
-	
-	// Update is called once per frame
+
 	void Update () 
 	{
 		healthText.text = health.ToString();
@@ -51,13 +50,13 @@ public class BallHealth : MonoBehaviour {
 					left = !left;
 				}
 			}
-			
-
 		}
 	}
 
 	void OnTriggerEnter (Collider other) 
 	{
+		//When hit by a bullet reduce health by the necessary amount
+		//and change color of the ball. Also deactivate that bullet.
 		if(other.gameObject.tag == "Ammo") 
 		{
 			health -= Stats.sharedInstance.bulletDamage;
@@ -65,15 +64,14 @@ public class BallHealth : MonoBehaviour {
 			ChangeColor();
 		}
 	}
-
 	
 	void SpawnSplit (int hp, Vector3 explosionPos, Vector3 newSize, bool left) 
 	{
+		//Grab new enemies from the pool to be used as the splits.
 		GameObject enemy = ObjectPooler.sharedInstance.GetPooledObject("Enemy"); 
         if (enemy != null) {
 			BallHealth enemyHealth = enemy.GetComponent<BallHealth>();
 			Rigidbody rigid = enemy.GetComponent<Rigidbody>();
-			
 
             enemy.transform.position = explosionPos;
 			enemy.transform.localScale = newSize;
@@ -90,6 +88,7 @@ public class BallHealth : MonoBehaviour {
 
 	void ChangeColor () 
 	{
+		//Lerp between some colors as damage is received for flavor.
 		oldColor = colors[(int) colorIndex % colorsLength];
 		newColor = colors[(int) (colorIndex + 1f) % colorsLength];;
 		rend.material.color = Color.Lerp(oldColor, newColor, newFreq);
@@ -102,6 +101,7 @@ public class BallHealth : MonoBehaviour {
 
 	Vector3 GetHalfSize() 
 	{
+		//Halve the size of the splits compared to the original ball.
 		float halfSize = transform.localScale.x / 2;
 		return new Vector3(halfSize, halfSize, 0.25f);
 	}

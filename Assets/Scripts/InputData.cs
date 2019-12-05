@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
+//Serializable classes to be constructed from the given json for
+//the first 5 levels. The constructors for Level and Ball class are
+//used for randomly generated levels after level 5.
 [System.Serializable]
 public class InputData 
 {
