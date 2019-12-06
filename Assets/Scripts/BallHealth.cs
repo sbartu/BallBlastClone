@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class BallHealth : MonoBehaviour {
 
-	public int health;
+	public int health = 10;
 	public List<int> splits;
 	public float delay;
 	private bool left = true;
@@ -59,7 +59,19 @@ public class BallHealth : MonoBehaviour {
 		//and change color of the ball. Also deactivate that bullet.
 		if(other.gameObject.tag == "Ammo") 
 		{
-			health -= Stats.sharedInstance.bulletDamage;
+			int damage = Stats.sharedInstance.bulletDamage;
+			int currentHealth = health;
+			currentHealth -= damage;
+
+			if(currentHealth < 0)
+				currentHealth = 0;
+
+			//Add up the score based on lost health.
+			int healthDiff = health - currentHealth;
+			LevelProgress.sharedInstance.currentDamage += healthDiff;
+			LevelProgress.sharedInstance.totalDamage += healthDiff;
+			
+			health = currentHealth;
 			other.gameObject.SetActive(false);
 			ChangeColor();
 		}

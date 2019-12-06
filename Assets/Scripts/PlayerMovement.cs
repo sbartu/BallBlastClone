@@ -39,6 +39,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    void OnCollisionEnter(Collision collision) 
+    {
+        if(collision.gameObject.tag == "Enemy")
+            LevelProgress.sharedInstance.DisplayLoseScreen();
+    }
+
     void Shoot() {
         //Get the bullets  from the object pool and activate it
         //above the player.
@@ -52,6 +58,7 @@ public class PlayerMovement : MonoBehaviour
             bullets.Add(bullet);
         }
 
+        //If there is only one bullet count (1st level) just place it above the player.
         if(bulletCount == 1) 
         {
             bullets[0].transform.position = transform.position + Vector3.up;
@@ -61,7 +68,7 @@ public class PlayerMovement : MonoBehaviour
         //The following logic is for spacing the bullets above the player
         //in an ordinarily way. 
         int midpoint = bulletCount / 2;
-        float offset = 1 / (float) bulletCount;
+        float offset = Stats.sharedInstance.bulletWidth / (float) bulletCount;
         float start = midpoint * offset;
         int index = midpoint;
 

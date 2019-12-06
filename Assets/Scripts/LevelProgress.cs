@@ -1,9 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LevelProgress : MonoBehaviour {
 
+	public static LevelProgress sharedInstance;
 	public List<Level> levels;
 	public int currentLevel = 0;
 	public int SpawnXPosMax = 7;
@@ -11,30 +14,79 @@ public class LevelProgress : MonoBehaviour {
 	public float SpawnYPosMax = 9f;
 	public float SpawnYPosMin = 7f;
 	private bool gameStarted = false;
+	private bool gameEnded = false;
 	private int LastTotalHealth;
 	private float levelHealthMax = 1.2f;
 	private float levelHealthMin = 0.8f;
 
-	void Start () {
+	private GameObject startDisp;
+	private GameObject winDisp;
+	private GameObject loseDisp;
+	private GameObject scoreDisp;
+	private Text scoreText;
+	private Text winText;
+	private Text loseText;
+
+	private int totalHealth = 0;
+	public int currentDamage = 0;
+	public int totalDamage = 0;
+
+	void Start () 
+	{
+		FindTexts();
 		levels = Stats.sharedInstance.input.levels;
-		LastLevelTotalHealth();
-		NextLevel();
+		sharedInstance = this;
+		//Store health of last level ahead of time
+		//to use it for random level generation.
+		LastTotalHealth = TotalHealth(4);
+	}
+
+	void FindTexts() 
+	{
+		//Find respective canvas objects.
+		GameObject canvas = GameObject.Find("Canvas");
+		startDisp = canvas.transform.Find("StartText").gameObject;
+		winDisp = canvas.transform.Find("WinDisplay").gameObject;
+		scoreDisp = canvas.transform.Find("ScoreText").gameObject;
+		scoreText = scoreDisp.GetComponent<Text>();
+		winText = winDisp.GetComponentInChildren<Text>();
+		loseDisp = canvas.transform.Find("LoseDisplay").gameObject;
+		loseText = loseDisp.GetComponentInChildren<Text>();
 	}
 
 	void Update () 
 	{
-		//Check when to advance to the next level.
+		//Display appropriate score for during the game play and end screen.
+		if(!gameEnded)
+			scoreText.text = currentDamage + " / " + totalHealth;
+		else
+			scoreText.text = "Total Damage Done = " + totalDamage;
+
+		//Start the game when mouse left-click is registered.
+		if (!gameStarted && Input.GetMouseButton(0)) {
+			startDisp.SetActive(false);
+			DisplayScore();
+			NextLevel();
+		}
+		//Check when to advance to pause and display win screen.
 		if(gameStarted && ObjectPooler.sharedInstance.EnemiesDead()) 
 		{
-			NextLevel();
+			Time.timeScale = 0;
+			DisplayWinScreen(true);
 		}
 	}
 
-	void NextLevel () 
+	public void NextLevel () 
 	{
+		//Reset current level damage and unpause game.
+		currentDamage = 0;
+		DisplayWinScreen(false); 
+		Time.timeScale = 1;
 		//If given levels have ended, start randomizing from here on out.
 		if(currentLevel > 4)
 			CreateNewLevel();
+
+		totalHealth = TotalHealth(currentLevel);
 
 		//Increase bullet count and bullet damage after the initial level.
 		if(currentLevel > 0)
@@ -104,18 +156,18 @@ public class LevelProgress : MonoBehaviour {
 		rigid.AddForce(100f * (randomValue > 0.5f ? Vector3.right : Vector3.left));
 	}
 
-	void LastLevelTotalHealth() 
+	int TotalHealth(int levelNo) 
 	{
-		//Find the total health of Level 5 from the given json.
+		//Find the total health for the given levelNo from the given json.
 		int totalHealth = 0;
-		List<Ball> balls = levels[4].balls;
+		List<Ball> balls = levels[levelNo].balls;
 		for(int i = 0; i < balls.Count; i++) {
 			totalHealth += balls[i].hp;
 			foreach(int hp in balls[i].splits) {
 				totalHealth += hp;
 			}
 		}
-		LastTotalHealth = totalHealth;
+		return totalHealth;
 	}
 
 	void CreateNewLevel() 
@@ -164,5 +216,30 @@ public class LevelProgress : MonoBehaviour {
 		//Create a new level with the newly randomized balls. Add the level to the levels list.
 		Level newLevel = new Level(new List<Ball>() {Ball1in, Ball2in, Ball3in, Ball4in});
 		levels.Add(newLevel);
+	}
+
+	//Canvas display functions are below.
+	void DisplayWinScreen(bool on) 
+	{
+		winText.text = "Level " + currentLevel + " cleared. Nice! :)";
+		winDisp.SetActive(on);
+	}
+
+	public void DisplayLoseScreen() 
+	{
+		loseText.text = "Lost at level " + currentLevel + " :(. Try Again?";
+		Time.timeScale = 0;
+		gameEnded = true;
+		loseDisp.SetActive(true);
+	}
+
+	void DisplayScore() 
+	{
+		scoreDisp.SetActive(true);
+	}
+
+	public void RestartGame() 
+	{
+		SceneManager.LoadScene(SceneManager.GetActiveScene().name);
 	}
 }
