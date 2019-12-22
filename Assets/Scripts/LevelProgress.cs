@@ -201,7 +201,7 @@ public class LevelProgress : MonoBehaviour {
 
 		//Split the health into 4 balls. Last ball gets remaining health.
 		int maxPerBall = totalHealth / 4;
-		int minPerBall = 2;
+		int minPerBall = 15;
 		int Ball1 = Random.Range(minPerBall, maxPerBall);
 		int Ball2 = Random.Range(minPerBall, maxPerBall);
 		int Ball3 = Random.Range(minPerBall, maxPerBall);

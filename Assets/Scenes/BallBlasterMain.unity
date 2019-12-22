@@ -460,7 +460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 350
-  angleOffset: 5
+  angleOffset: 2
 --- !u!54 &552123385
 Rigidbody:
   m_ObjectHideFlags: 0
