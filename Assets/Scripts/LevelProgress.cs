@@ -8,15 +8,16 @@ public class LevelProgress : MonoBehaviour {
 
 	public static LevelProgress sharedInstance;
 	public List<Level> levels;
-	private int currentLevel = 0;
+	public int currentDamage = 0;
+	public int totalDamage = 0;
+	public float launchForce;
+	public float proceduralIncrementer = 1.4f;
+
+	private int currentLevel = 5;
 	private float SpawnXPosMax = 2f;
 	private float SpawnXPosMin = -2f;
 	private float SpawnYPosMax = 9f;
 	private float SpawnYPosMin = 6.5f;
-	public int currentDamage = 0;
-	public int totalDamage = 0;
-	public float launchForce;
-	public float proceduralIncrementer = 1.2f;
 
 	private GameObject startDisp;
 	private GameObject winDisp;
@@ -28,9 +29,7 @@ public class LevelProgress : MonoBehaviour {
 	private Text loseText;
 	private bool gameStarted = false;
 	private bool gameEnded = false;
-	private int LastTotalHealth;
-	private float levelHealthMax = 1.2f;
-	private float levelHealthMin = 0.8f;
+	private int lastTotalHealth;
 	private int totalHealth = 0;
 	private int totalBallNum = 0;
 
@@ -41,7 +40,7 @@ public class LevelProgress : MonoBehaviour {
 		sharedInstance = this;
 		//Store health of last level ahead of time
 		//to use it for random level generation.
-		LastTotalHealth = TotalHealth(4);
+		lastTotalHealth = TotalHealth(4);
 	}
 
 	void FindTexts() 
@@ -194,51 +193,72 @@ public class LevelProgress : MonoBehaviour {
 
 	void CreateNewLevel() 
 	{
+		float levelHealthMax = 1.2f;
+		float levelHealthMin = 0.8f;
+		float delayMax = 12;
+		float delayMin = 0;
+		float randomMin = 0.6f;
+		float randomMax = 1.4f;
 		//Create a new randomized level based off of the total health from Level 5.
 		//The total health is in between %80 and %120 of Level 5. Delays are the same.
 		float levelHealthOffset = Random.Range(levelHealthMin, levelHealthMax);
-		int totalHealth = Mathf.FloorToInt(LastTotalHealth * levelHealthOffset);
+		int totalHealth = Mathf.FloorToInt(lastTotalHealth * levelHealthOffset);
 
 		//Split the health into 4 balls. Last ball gets remaining health.
-		int maxPerBall = totalHealth / 4;
-		int minPerBall = 15;
-		int Ball1 = Random.Range(minPerBall, maxPerBall);
-		int Ball2 = Random.Range(minPerBall, maxPerBall);
-		int Ball3 = Random.Range(minPerBall, maxPerBall);
-		int Ball4 = totalHealth - Ball1 - Ball2 - Ball3;
+		int dividedHealth = totalHealth / 4;
+		int ball1 = (int) (dividedHealth * Random.Range(randomMin, randomMax));
+		int ball2 = (int) (dividedHealth * Random.Range(randomMin, randomMax));
+		int ball3 = (int) (dividedHealth * Random.Range(randomMin, randomMax));
+		int ball4 = (int) (dividedHealth * Random.Range(randomMin, randomMax));
 
 		//Ball health is shared with its splits.
-		Ball1 = Ball1 / 2;
-		Ball2 = Ball2 / 2;
-		Ball3 = Ball3 / 2;
-		Ball4 = Ball4 / 2;
+		ball1 = ball1 / 2;
+		ball2 = ball2 / 2;
+		ball3 = ball3 / 2;
+		ball4 = ball4 / 2;
 
-		int Split1 = Ball1 / 2;
-		int Split2 = Ball2 / 2;
-		int Split3 = Ball3 / 2;
-		int Split4 = Ball4 / 2;
+		int split1 = ball1 / 2;
+		int split2 = ball2 / 2;
+		int split3 = ball3 / 2;
+		int split4 = ball4 / 2;
 
 		//If any extra health reamins, split them in equal but give the remainder of the operation
 		//to the first ball (arbitrary).
-		int RemainingHealth = totalHealth - Ball1 - Ball2 - Ball3 - Ball4 - (Split1 * 2) - (Split2 * 2) - (Split3 * 2) - (Split4 * 2);
-		int Remainder = RemainingHealth % 4;
-		RemainingHealth = RemainingHealth / 4;
+		int remainingHealth = totalHealth - ball1 - ball2 - ball3 - ball4 - (split1 * 2) - (split2 * 2) - (split3 * 2) - (split4 * 2);
 
-		Ball1 += RemainingHealth + Remainder;
-		Ball2 += RemainingHealth;
-		Ball3 += RemainingHealth;
-		Ball4 += RemainingHealth;
+		if (remainingHealth > 0) 
+		{
+			while(remainingHealth - 4 > 0) {
+				remainingHealth -= 4;
+				ball1++;
+				ball2++;
+				ball3++;
+				ball4++;
+			}
+			ball1 += remainingHealth;
+		}
+		else if (remainingHealth < 0) 
+		{
+			while(remainingHealth + 4 < 0) {
+				remainingHealth += 4;
+				ball1--;
+				ball2--;
+				ball3--;
+				ball4--;
+			}
+			ball2 -= remainingHealth;
+		}
 
 		//Initialize balls.
-		Ball Ball1in = new Ball(Ball1, new List<int>() {Split1, Split1}, 0);
-		Ball Ball2in = new Ball(Ball2, new List<int>() {Split2, Split2}, 4);
-		Ball Ball3in = new Ball(Ball3, new List<int>() {Split3, Split3}, 10);
-		Ball Ball4in = new Ball(Ball4, new List<int>() {Split4, Split4}, 12);
+		Ball ball1in = new Ball(ball1, new List<int>() {split1, split1}, Random.Range(delayMin, delayMax));
+		Ball ball2in = new Ball(ball2, new List<int>() {split2, split2}, Random.Range(delayMin, delayMax));
+		Ball ball3in = new Ball(ball3, new List<int>() {split3, split3}, Random.Range(delayMin, delayMax));
+		Ball ball4in = new Ball(ball4, new List<int>() {split4, split4}, Random.Range(delayMin, delayMax));
 
 		//Create a new level with the newly randomized balls. Add the level to the levels list.
-		Level newLevel = new Level(new List<Ball>() {Ball1in, Ball2in, Ball3in, Ball4in});
+		Level newLevel = new Level(new List<Ball>() {ball1in, ball2in, ball3in, ball4in});
 		levels.Add(newLevel);
-		LastTotalHealth = (int) (LastTotalHealth * proceduralIncrementer);
+		lastTotalHealth = (int) (lastTotalHealth * proceduralIncrementer);
 	}
 
 	//Canvas display functions are below.

@@ -751,7 +751,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Delegates:
-  - eventID: 4
+  - eventID: 2
     callback:
       m_PersistentCalls:
         m_Calls:
@@ -1221,6 +1221,11 @@ Prefab:
         type: 2}
       propertyPath: launchForce
       value: 55
+      objectReference: {fileID: 0}
+    - target: {fileID: 114170183568350404, guid: c236262d362f3d147aa68012a299bc47,
+        type: 2}
+      propertyPath: currentLevel
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c236262d362f3d147aa68012a299bc47, type: 2}
