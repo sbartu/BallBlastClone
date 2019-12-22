@@ -8,28 +8,31 @@ public class LevelProgress : MonoBehaviour {
 
 	public static LevelProgress sharedInstance;
 	public List<Level> levels;
-	public int currentLevel = 0;
-	public int SpawnXPosMax = 7;
-	public int SpawnXPosMin = -7;
-	public float SpawnYPosMax = 9f;
-	public float SpawnYPosMin = 7f;
-	private bool gameStarted = false;
-	private bool gameEnded = false;
-	private int LastTotalHealth;
-	private float levelHealthMax = 1.2f;
-	private float levelHealthMin = 0.8f;
+	private int currentLevel = 0;
+	private float SpawnXPosMax = 2f;
+	private float SpawnXPosMin = -2f;
+	private float SpawnYPosMax = 9f;
+	private float SpawnYPosMin = 6.5f;
+	public int currentDamage = 0;
+	public int totalDamage = 0;
+	public float launchForce;
+	public float proceduralIncrementer = 1.2f;
 
 	private GameObject startDisp;
 	private GameObject winDisp;
 	private GameObject loseDisp;
 	private GameObject scoreDisp;
+	private GameObject startRect;
 	private Text scoreText;
 	private Text winText;
 	private Text loseText;
-
+	private bool gameStarted = false;
+	private bool gameEnded = false;
+	private int LastTotalHealth;
+	private float levelHealthMax = 1.2f;
+	private float levelHealthMin = 0.8f;
 	private int totalHealth = 0;
-	public int currentDamage = 0;
-	public int totalDamage = 0;
+	private int totalBallNum = 0;
 
 	void Start () 
 	{
@@ -45,6 +48,7 @@ public class LevelProgress : MonoBehaviour {
 	{
 		//Find respective canvas objects.
 		GameObject canvas = GameObject.Find("Canvas");
+		startRect = canvas.transform.Find("GameStarter").gameObject;
 		startDisp = canvas.transform.Find("StartText").gameObject;
 		winDisp = canvas.transform.Find("WinDisplay").gameObject;
 		scoreDisp = canvas.transform.Find("ScoreText").gameObject;
@@ -54,25 +58,32 @@ public class LevelProgress : MonoBehaviour {
 		loseText = loseDisp.GetComponentInChildren<Text>();
 	}
 
-	void Update () 
+	public void DecreaseBallNum() 
 	{
-		//Display appropriate score for during the game play and end screen.
+		//Decreases number of enemies left by 1. Ends level if it reaches 0.
+		totalBallNum -= 1;
+		if(gameStarted && totalBallNum <= 0) 
+			{
+				Time.timeScale = 0;
+				DisplayWinScreen(true);
+			}
+	}
+
+	public void UpdateScoreText() 
+	{
 		if(!gameEnded)
 			scoreText.text = currentDamage + " / " + totalHealth;
-		else
-			scoreText.text = "Total Damage Done = " + totalDamage;
+	}
 
+	public void StartGame () 
+	{
 		//Start the game when mouse left-click is registered.
-		if (!gameStarted && Input.GetMouseButton(0)) {
+		if (!gameStarted) {
+			startRect.SetActive(false);
 			startDisp.SetActive(false);
-			DisplayScore();
+			
 			NextLevel();
-		}
-		//Check when to advance to pause and display win screen.
-		if(gameStarted && ObjectPooler.sharedInstance.EnemiesDead()) 
-		{
-			Time.timeScale = 0;
-			DisplayWinScreen(true);
+			DisplayScore();
 		}
 	}
 
@@ -87,6 +98,7 @@ public class LevelProgress : MonoBehaviour {
 			CreateNewLevel();
 
 		totalHealth = TotalHealth(currentLevel);
+		UpdateScoreText();
 
 		//Increase bullet count and bullet damage after the initial level.
 		if(currentLevel > 0)
@@ -96,6 +108,7 @@ public class LevelProgress : MonoBehaviour {
 		for (int i = 0; i < levels[currentLevel].balls.Count; i++) {
 			StartCoroutine(SpawnBall(levels[currentLevel].balls[i]));
 		}
+		SetTotalBallNum(currentLevel);
 		gameStarted = true;
 		currentLevel++;
 	}
@@ -113,9 +126,10 @@ public class LevelProgress : MonoBehaviour {
 			//The enemies are set active outside of the gamefield to mark them as in use.
 			//Gravity is disabled to prevent them from falling for eternity before they are spawned.
 			rigid.useGravity = false;
-			enemy.SetActive(true);
+			enemy.layer = 11;
 			enemyHealth.health = ball.hp;
 			enemyHealth.splits = ball.splits;
+			enemy.SetActive(true);
 
 			yield return new WaitForSeconds(ball.delay);
 			//After the respective delay, start the coroutine to move the ball
@@ -153,7 +167,15 @@ public class LevelProgress : MonoBehaviour {
 		//A little boost is added as a force to propel the ball into the gamefield.
 		collision.isTrigger = false;
 		rigid.useGravity = true;
-		rigid.AddForce(100f * (randomValue > 0.5f ? Vector3.right : Vector3.left));
+		enemy.layer = 10;
+		rigid.AddForce(launchForce * (randomValue > 0.5f ? Vector3.right : Vector3.left));
+	}
+
+	void SetTotalBallNum(int levelNo) 
+	{
+		//Set the total number of balls (*3 since every ball has 2 splits) 
+		//for the given levelNo from the given json.
+		totalBallNum = levels[levelNo].balls.Count * 3;
 	}
 
 	int TotalHealth(int levelNo) 
@@ -216,18 +238,20 @@ public class LevelProgress : MonoBehaviour {
 		//Create a new level with the newly randomized balls. Add the level to the levels list.
 		Level newLevel = new Level(new List<Ball>() {Ball1in, Ball2in, Ball3in, Ball4in});
 		levels.Add(newLevel);
+		LastTotalHealth = (int) (LastTotalHealth * proceduralIncrementer);
 	}
 
 	//Canvas display functions are below.
 	void DisplayWinScreen(bool on) 
 	{
-		winText.text = "Level " + currentLevel + " cleared. Nice! :)";
+		winText.text = "Level " + currentLevel + " cleared!";
 		winDisp.SetActive(on);
 	}
 
 	public void DisplayLoseScreen() 
 	{
-		loseText.text = "Lost at level " + currentLevel + " :(. Try Again?";
+		scoreText.text = "Total Damage Done = " + totalDamage;
+		loseText.text = "Lost at level " + currentLevel;
 		Time.timeScale = 0;
 		gameEnded = true;
 		loseDisp.SetActive(true);

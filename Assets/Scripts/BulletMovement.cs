@@ -7,7 +7,6 @@ public class BulletMovement : MonoBehaviour {
 	private Rigidbody rigid; 
 	private Vector3 moveDirection = Vector3.zero;
     public float speed;
-	public GameObject player;
 
 	void OnEnable () 
 	{
@@ -16,7 +15,7 @@ public class BulletMovement : MonoBehaviour {
 		SetSpeed();
 	}
 
-	void SetSpeed () 
+	public void SetSpeed () 
 	{
 		//Propel the bullet upwards with a fixed velocity.
 		Vector3 velocity = (transform.up * speed * Time.fixedDeltaTime);

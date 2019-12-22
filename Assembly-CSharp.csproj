@@ -60,6 +60,7 @@
      <Compile Include="Assets\Scripts\ObjectPooler.cs" />
      <Compile Include="Assets\Scripts\PlayerMovement.cs" />
      <Compile Include="Assets\Scripts\Stats.cs" />
+     <Compile Include="Assets\ShakeCamera.cs" />
  <Reference Include="UnityEditor.StandardEvents">
  <HintPath>C:/Users/Bartu/BallBlast2018/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
  </Reference>

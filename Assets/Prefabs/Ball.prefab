@@ -172,12 +172,7 @@ MonoBehaviour:
   health: 10
   splits: 
   delay: 0
-  offset: 145.83
-  colors:
-  - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 0, g: 1, b: 1, a: 1}
-  - {r: 1, g: 0, b: 1, a: 1}
-  - {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  splitForceOffset: 50
   colorChangeFrequency: 0.2
 --- !u!114 &114466665991079504
 MonoBehaviour:

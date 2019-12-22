@@ -1,6 +1,6 @@
 {
-  "gravity": -9.96,
-  "bullet_count_increase": 2,
+  "gravity": -3.00,
+  "bullet_count_increase": 1,
   "bullet_damage_increase": 1,
   
   "levels": [

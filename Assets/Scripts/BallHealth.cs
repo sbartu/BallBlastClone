@@ -8,49 +8,41 @@ public class BallHealth : MonoBehaviour {
 	public int health = 10;
 	public List<int> splits;
 	public float delay;
-	private bool left = true;
-	public float offset = 0.2f;
-	public Color[] colors = {Color.green, Color.cyan, Color.magenta, Color.yellow};
-	private int colorsLength;
+	public float splitForceOffset = 0.01f;
 	public float colorChangeFrequency = 0.1f;
 
+	private bool left;
+	private int colorsLength;
 	private float colorIndex = 0f;
+	private float newT;
+	private float newFreq;
+	private Color[] colors = {Color.green, Color.cyan, Color.magenta, Color.yellow};
 	private Color oldColor;
 	private Color newColor;
-	private float newT;
 	private Renderer rend;
-	private float newFreq;
 	private Vector3 explodePosition;
 	private Text healthText;
+	private Rigidbody rigid;
 
 
 	void Start () 
 	{
 		colorsLength = colors.Length;
 		rend = GetComponent<Renderer>();
-		healthText = GetComponentInChildren<Text>();
+		rigid = GetComponent<Rigidbody>();
 		newFreq = colorChangeFrequency;
+		left = true;
 	}
 
-	void Update () 
+	void OnEnable () 
+	{
+		healthText = GetComponentInChildren<Text>();
+		UpdateHealthText();
+	}
+
+	void UpdateHealthText () 
 	{
 		healthText.text = health.ToString();
-		if(health <= 0) 
-		{
-			//When health is depleted, move to outside of gamefield and setActive false.
-			explodePosition = transform.position;
-			transform.position = new Vector3(10f, 0f, 0f);
-			gameObject.SetActive(false);
-			if(splits != null) 
-			{
-				Vector3 newSize = GetHalfSize();
-				foreach(int hp in splits) 
-				{
-					SpawnSplit(hp, explodePosition, newSize, left);
-					left = !left;
-				}
-			}
-		}
 	}
 
 	void OnTriggerEnter (Collider other) 
@@ -74,6 +66,34 @@ public class BallHealth : MonoBehaviour {
 			health = currentHealth;
 			other.gameObject.SetActive(false);
 			ChangeColor();
+			UpdateHealthText();
+			LevelProgress.sharedInstance.UpdateScoreText();
+
+			if(health <= 0) 
+			{
+				//When health is depleted, move to outside of gamefield and setActive false.
+				explodePosition = transform.position;
+				transform.position = new Vector3(10f, 0f, 0f);
+				
+				//Decreases number of enemies left by 1. Ends level if it reaches 0.
+				LevelProgress.sharedInstance.DecreaseBallNum();
+
+				if(splits != null) 
+				{
+					Vector3 newSize = GetHalfSize();
+					foreach(int hp in splits) 
+					{
+						SpawnSplit(hp, explodePosition, newSize, left);
+						left = !left;
+					}
+				}
+				rigid.velocity = Vector3.zero;
+				rigid.angularVelocity = Vector3.zero;
+				gameObject.SetActive(false);
+
+				//Shake Camera for flavor.
+				Camera.main.GetComponent<ShakeCamera>().ShakeCam();
+			}
 		}
 	}
 	
@@ -93,8 +113,8 @@ public class BallHealth : MonoBehaviour {
 
 			//On Explosion, add an up force to both splits. Add a left force to one
 			//and a right force to the other.
-			rigid.AddForce((left ? Vector3.left : Vector3.right) * offset);
-			rigid.AddForce(Vector3.up * offset);
+			Vector3 splitForce = (left ? Vector3.left + Vector3.up : Vector3.right + Vector3.up) * splitForceOffset;
+			rigid.AddRelativeForce(splitForce);
         }
 	}
 

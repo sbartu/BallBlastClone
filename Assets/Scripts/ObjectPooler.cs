@@ -58,15 +58,4 @@ public class ObjectPooler : MonoBehaviour {
 		//Otherwise return null.
 		return null;
 	}
-
-	public bool EnemiesDead() 
-	{
-		//Return true if all of the enemies of the current level are dead.
-		for (int i = 0; i < pooledObjects.Count; i++) {
-			if (pooledObjects[i].activeInHierarchy && pooledObjects[i].tag == "Enemy") {
-				return false;
-			}
-		}
-		return true;
-	}
 }

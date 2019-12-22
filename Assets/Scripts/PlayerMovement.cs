@@ -12,6 +12,7 @@ public class PlayerMovement : MonoBehaviour
 	private Vector3 moveDirection = Vector3.zero;
     private bool canShoot = true;
     public float speed;
+    public float angleOffset;
     private float shootDelay;
     private IEnumerator coroutine;
 
@@ -50,46 +51,51 @@ public class PlayerMovement : MonoBehaviour
         //above the player.
         List<GameObject> bullets = new List<GameObject>();
         int bulletCount = Stats.sharedInstance.bulletCount;
+        Vector3 abovePlayer = transform.position + (Vector3.up / 2f);
 
         for(int i = 0; i < bulletCount; i++) 
         {
             GameObject bullet = ObjectPooler.sharedInstance.GetPooledObject("Ammo");
-            bullet.SetActive(true);
+            // bullet.SetActive(true);
             bullets.Add(bullet);
+            bullets[i].SetActive(true);
         }
 
         //If there is only one bullet count (1st level) just place it above the player.
         if(bulletCount == 1) 
         {
-            bullets[0].transform.position = transform.position + Vector3.up;
+            bullets[0].transform.position = abovePlayer;
+            bullets[0].SetActive(true);
             return;
         }
 
         //The following logic is for spacing the bullets above the player
         //in an ordinarily way. 
         int midpoint = bulletCount / 2;
-        float offset = Stats.sharedInstance.bulletWidth / (float) bulletCount;
-        float start = midpoint * offset;
+        float gutter = Stats.sharedInstance.bulletWidth / (float) bulletCount;
+        float start = midpoint * gutter;
         int index = midpoint;
 
         for(int i = 0; i < midpoint; i++) 
         {
-            bullets[i].transform.position = transform.position + Vector3.up + (index * offset * Vector3.left);
+            bullets[i].transform.position = abovePlayer;
+            bullets[i].transform.localEulerAngles = new Vector3(0, 0, 360f - angleOffset) * index;
             index--;
         }
 
         //If bullet count is odd, place one bullet right above the player.
         //Else continue spacing them.
-        if(bulletCount % 2 == 0)
-            index = 1;
-        else
-            index = 0;
+        index = (bulletCount % 2 == 0 ? 1 : 0);
 
         for(int i = midpoint; i < bulletCount; i++) 
         {
-            bullets[i].transform.position = transform.position + Vector3.up + (index * offset * Vector3.right);
+            bullets[i].transform.position = abovePlayer;
+            bullets[i].transform.localEulerAngles = new Vector3(0, 0, angleOffset) * index;
             index++;
         }
+
+        foreach (GameObject bullet in bullets)
+            bullet.GetComponent<BulletMovement>().SetSpeed();
     }
 
     private IEnumerator WaitToShoot(float waitTime)
