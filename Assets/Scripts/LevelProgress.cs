@@ -13,7 +13,7 @@ public class LevelProgress : MonoBehaviour {
 	public float launchForce;
 	public float proceduralIncrementer = 1.4f;
 
-	private int currentLevel = 5;
+	private int currentLevel = 0;
 	private float SpawnXPosMax = 2f;
 	private float SpawnXPosMin = -2f;
 	private float SpawnYPosMax = 9f;
