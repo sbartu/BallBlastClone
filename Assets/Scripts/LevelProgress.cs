@@ -12,6 +12,7 @@ public class LevelProgress : MonoBehaviour {
 	public int totalDamage = 0;
 	public float launchForce;
 	public float proceduralIncrementer = 1.4f;
+	public AudioClip battleBgm;
 
 	private int currentLevel = 0;
 	private float SpawnXPosMax = 2f;
@@ -80,7 +81,10 @@ public class LevelProgress : MonoBehaviour {
 		if (!gameStarted) {
 			startRect.SetActive(false);
 			startDisp.SetActive(false);
-			
+
+			AudioSource audio = Camera.main.GetComponent<AudioSource>();
+			audio.clip = battleBgm;
+			audio.Play();
 			NextLevel();
 			DisplayScore();
 		}

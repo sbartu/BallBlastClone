@@ -348,6 +348,7 @@ GameObject:
   - component: {fileID: 534669904}
   - component: {fileID: 534669903}
   - component: {fileID: 534669906}
+  - component: {fileID: 534669907}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -428,6 +429,101 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shakeStart: 0.1
   shakeDecrement: 0.4
+--- !u!82 &534669907
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 534669902}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: f3a505a9573e7c243ad8e6b763c2681c, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &552123383
 GameObject:
   m_ObjectHideFlags: 0
@@ -460,7 +556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 350
-  angleOffset: 2
+  angleOffset: 1.5
 --- !u!54 &552123385
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -663,7 +759,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 5046c238bceb75e42b5b6127bd3ecc03, type: 2}
+  - {fileID: 2100000, guid: 1cdfc7c85880ab546b53d2efead70ab8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -848,7 +944,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 98a79bb19c7d0404bac46253eec1ab2e, type: 2}
+  - {fileID: 2100000, guid: 900453516b0253e43816d3328b4da57a, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1227,6 +1323,17 @@ Prefab:
       propertyPath: currentLevel
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114981778193398760, guid: c236262d362f3d147aa68012a299bc47,
+        type: 2}
+      propertyPath: itemsToPool.Array.data[0].objectToPool
+      value: 
+      objectReference: {fileID: 1461527972384474, guid: b5e5208a2c98f4a4c9473648e65312c0,
+        type: 2}
+    - target: {fileID: 114170183568350404, guid: c236262d362f3d147aa68012a299bc47,
+        type: 2}
+      propertyPath: battleBgm
+      value: 
+      objectReference: {fileID: 8300000, guid: 0e25683e2f157104b804bb0509db3442, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c236262d362f3d147aa68012a299bc47, type: 2}
   m_IsPrefabAsset: 0
@@ -1684,7 +1791,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemsToPool:
   - amountToPool: 100
-    objectToPool: {fileID: 1308704255610916, guid: f6a73e299b85b9340837f97515c464df,
+    objectToPool: {fileID: 1461527972384474, guid: b5e5208a2c98f4a4c9473648e65312c0,
       type: 2}
     shouldExpand: 1
   - amountToPool: 10
@@ -1723,6 +1830,7 @@ MonoBehaviour:
   totalDamage: 0
   launchForce: 55
   proceduralIncrementer: 1.2
+  battleBgm: {fileID: 8300000, guid: 0e25683e2f157104b804bb0509db3442, type: 3}
 --- !u!1 &1714894947
 GameObject:
   m_ObjectHideFlags: 0
@@ -1768,7 +1876,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 5046c238bceb75e42b5b6127bd3ecc03, type: 2}
+  - {fileID: 2100000, guid: 1cdfc7c85880ab546b53d2efead70ab8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1853,7 +1961,7 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 5046c238bceb75e42b5b6127bd3ecc03, type: 2}
+  - {fileID: 2100000, guid: 1cdfc7c85880ab546b53d2efead70ab8, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
